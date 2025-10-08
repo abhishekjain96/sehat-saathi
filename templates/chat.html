@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sehat Saathi - Rural Healthcare AI Bot</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        /* Professional Header */
+        .header {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .status-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #00ff00;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .chat-container {
+            height: 70vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease-in;
+            position: relative;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            background: #007bff;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+
+        .bot-message {
+            background: white;
+            border: 1px solid #e0e0e0;
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .message-time {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .bot-message .message-time {
+            text-align: left;
+        }
+
+        .input-section {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .form-control {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,123,255,0.3);
+        }
+
+        .quick-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .quick-btn {
+            padding: 10px 16px;
+            border: 2px solid #007bff;
+            background: white;
+            color: #007bff;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .quick-btn:hover {
+            background: #007bff;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .quick-btn.emergency {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+            animation: emergencyPulse 2s infinite;
+        }
+
+        @keyframes emergencyPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Upload Section Styles */
+        .upload-section {
+            margin: 10px 0;
+            padding: 20px;
+            border: 2px dashed #007bff;
+            border-radius: 15px;
+            text-align: center;
+            background: #f8f9fa;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .upload-btn {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .upload-btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .upload-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .file-info {
+            margin: 15px 0;
+            font-size: 14px;
+            color: #666;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+        }
+
+        /* Scrollbar Styling */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+                padding: 15px;
+            }
+            
+            .chat-container {
+                height: 65vh;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+            
+            .quick-buttons {
+                justify-content: center;
+            }
+            
+            .quick-btn {
+                flex: 1;
+                min-width: 120px;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                border-radius: 15px;
+            }
+            
+            .quick-btn {
+                min-width: 100px;
+                font-size: 12px;
+            }
+        }
+
+        /* Loading Animation */
+        .typing-indicator {
+            display: inline-block;
+            padding: 10px 15px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            margin: 5px 0;
+        }
+
+        .typing-dots {
+            display: inline-block;
+        }
+
+        .typing-dots span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #999;
+            margin: 0 2px;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Professional Header -->
+        <div class="header">
+            <h1>
+                <i class="fas fa-stethoscope"></i>
+                Rural Healthcare AI Bot
+            </h1>
+            <p>Sehat Saathi - Your Digital Health Companion</p>
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>Online</span>
+            </div>
+        </div>
+        
+        <div class="chat-container">
+            <div id="chat-messages" class="chat-messages">
+                <div class="message bot-message">
+                    नमस्ते! मैं *Sehat Saathi* 🩺<br>
+                    Aapka AI Health Saathi!<br><br>
+                    1️⃣ 🚨 Emergency Help<br>
+                    2️⃣ 🩺 Health Query<br>
+                    3️⃣ 📅 Book Appointment<br>
+                    4️⃣ 🏥 Find Hospitals<br>
+                    5️⃣ 📞 Tele-Consultation<br><br>
+                    👉 Type number (1-5):
+                    <div class="message-time">Just now</div>
+                </div>
+            </div>
+            
+            <div class="input-section">
+                <!-- File Upload Section (Initially Hidden) -->
+                <div id="uploadSection" class="upload-section" style="display: none;">
+                    <h4>📷 Upload Prescription Image</h4>
+                    <p style="color: #666; margin-bottom: 15px; font-size: 14px;">
+                        Supported formats: JPEG, PNG, PDF<br>
+                        Maximum file size: 16MB
+                    </p>
+                    <input type="file" id="prescriptionFile" accept=".jpg,.jpeg,.png,.pdf" style="display: none;">
+                    <button class="upload-btn" onclick="document.getElementById('prescriptionFile').click()">
+                        <i class="fas fa-folder-open"></i> Choose File
+                    </button>
+                    <button class="upload-btn" onclick="uploadPrescription()" id="uploadBtn">
+                        <i class="fas fa-upload"></i> Upload Prescription
+                    </button>
+                    <div class="file-info" id="fileInfo">No file selected</div>
+                    <button class="upload-btn" onclick="hideUploadSection()" style="background: #6c757d;">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+                
+                <!-- Normal Input Section -->
+                <div class="input-group">
+                    <input type="text" id="user-input" placeholder="Type your message here..." class="form-control">
+                    <button onclick="sendMessage()" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> Send
+                    </button>
+                </div>
+                
+                <!-- Quick Buttons -->
+                <div class="quick-buttons">
+                    <button onclick="quickAction('menu')" class="quick-btn">
+                        <i class="fas fa-bars"></i> Menu
+                    </button>
+                    <button onclick="quickAction('hi')" class="quick-btn">
+                        <i class="fas fa-hand-wave"></i> Hello
+                    </button>
+                    <button onclick="quickAction('1')" class="quick-btn emergency">
+                        <i class="fas fa-ambulance"></i> Emergency
+                    </button>
+                    <button onclick="quickAction('2')" class="quick-btn">
+                        <i class="fas fa-stethoscope"></i> Health Query
+                    </button>
+                    <button onclick="quickAction('3')" class="quick-btn">
+                        <i class="fas fa-calendar-check"></i> Appointment
+                    </button>
+                    <button onclick="quickAction('4')" class="quick-btn">
+                        <i class="fas fa-hospital"></i> Find Hospitals
+                    </button>
+                    <button onclick="quickAction('5')" class="quick-btn">
+                        <i class="fas fa-video"></i> Tele-Consult
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentState = 'main_menu';
+        let sessionId = 'web_' + Math.random().toString(36).substr(2, 9);
+        
+        // Get current time for messages
+        function getCurrentTime() {
+            return new Date().toLocaleTimeString('en-IN', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            });
+        }
+        
+        // File upload handling
+        document.getElementById('prescriptionFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const fileInfo = document.getElementById('fileInfo');
+                const fileSize = (file.size / 1024 / 1024).toFixed(2); // Convert to MB
+                fileInfo.innerHTML = `
+                    <strong>Selected File:</strong> ${file.name}<br>
+                    <strong>Size:</strong> ${fileSize} MB<br>
+                    <strong>Type:</strong> ${file.type || 'Unknown'}
+                `;
+                document.getElementById('uploadBtn').disabled = false;
+                
+                // Validate file size
+                if (file.size > 16 * 1024 * 1024) {
+                    fileInfo.innerHTML += '<br><span style="color: red;">File too large! Max 16MB</span>';
+                    document.getElementById('uploadBtn').disabled = true;
+                }
+            }
+        });
+        
+        function showUploadSection() {
+            document.getElementById('uploadSection').style.display = 'block';
+            document.getElementById('user-input').disabled = true;
+        }
+        
+        function hideUploadSection() {
+            document.getElementById('uploadSection').style.display = 'none';
+            document.getElementById('user-input').disabled = false;
+            document.getElementById('prescriptionFile').value = '';
+            document.getElementById('fileInfo').innerHTML = 'No file selected';
+            document.getElementById('uploadBtn').disabled = true;
+        }
+        
+        function uploadPrescription() {
+            const fileInput = document.getElementById('prescriptionFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a file first!');
+                return;
+            }
+            
+            // Show uploading message
+            addMessage('📤 Uploading prescription image...', 'user');
+            
+            const uploadBtn = document.getElementById('uploadBtn');
+            uploadBtn.disabled = true;
+            uploadBtn.innerHTML = '⏳ Uploading...';
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            // Show typing indicator
+            showTypingIndicator();
+            
+            fetch('/api/upload-prescription-image', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideTypingIndicator();
+                
+                if (data.success) {
+                    // Add analysis to chat with nice formatting
+                    const analysisHTML = `
+                        <div class="prescription-analysis">
+                            <strong>📋 Prescription Analysis:</strong><br><br>
+                            ${data.analysis.replace(/\n/g, '<br>')}
+                        </div>
+                    `;
+                    addMessage(analysisHTML, 'bot');
+                } else {
+                    addMessage(`❌ Upload failed: ${data.message}`, 'bot');
+                }
+            })
+            .catch(error => {
+                hideTypingIndicator();
+                console.error('Upload error:', error);
+                addMessage('❌ Upload failed. Please try again.', 'bot');
+            })
+            .finally(() => {
+                hideUploadSection();
+                uploadBtn.disabled = false;
+                uploadBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Prescription';
+            });
+        }
+        
+        function sendMessage() {
+            const userInput = document.getElementById('user-input');
+            const message = userInput.value.trim();
+            
+            if (message) {
+                addMessage(message, 'user');
+                userInput.value = '';
+                
+                // Handle special states
+                if (currentState === 'prescription_upload') {
+                    showUploadSection();
+                    return;
+                }
+                
+                // Show typing indicator
+                showTypingIndicator();
+                
+                fetch('/web-chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        session_id: sessionId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    hideTypingIndicator();
+                    
+                    // Format medicine information
+                    let formattedReply = data.reply;
+                    if (data.reply.includes('Information about') && data.reply.includes('medicine')) {
+                        formattedReply = `<div class="medicine-info">${data.reply.replace(/\n/g, '<br>')}</div>`;
+                    } else {
+                        formattedReply = data.reply.replace(/\n/g, '<br>');
+                    }
+                    
+                    addMessage(formattedReply, 'bot');
+                    
+                    // Update current state based on response
+                    if (data.reply.includes('upload your prescription image')) {
+                        currentState = 'prescription_upload';
+                    } else if (data.reply.includes('Type number (1-6)')) {
+                        currentState = 'main_menu';
+                    }
+                })
+                .catch(error => {
+                    hideTypingIndicator();
+                    console.error('Error:', error);
+                    addMessage('❌ Network error. Please try again.', 'bot');
+                });
+            }
+        }
+        
+        function quickAction(action) {
+            document.getElementById('user-input').value = action;
+            sendMessage();
+        }
+        
+        function addMessage(text, sender) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            messageDiv.innerHTML = text;
+            
+            // Add timestamp
+            const timeDiv = document.createElement('div');
+            timeDiv.className = 'message-time';
+            timeDiv.textContent = getCurrentTime();
+            messageDiv.appendChild(timeDiv);
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function showTypingIndicator() {
+            const chatMessages = document.getElementById('chat-messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot-message typing-indicator';
+            typingDiv.id = 'typing-indicator';
+            typingDiv.innerHTML = `
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            `;
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function hideTypingIndicator() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+        
+        // Enter key support
+        document.getElementById('user-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Auto-focus on input
+        document.getElementById('user-input').focus();
+    </script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+[
+    {
+        "name": "Dr. Ravi Sharma",
+        "specialization": "General Physician",
+        "fee": "Free",
+        "contact": "+919876543210",
+        "online_link": "https://wa.me/919876543210",
+        "languages": ["Hindi","English"]
+    },
+    {
+        "name": "Dr. Priya Mehta",
+        "specialization": "Pediatrics",
+        "fee": "₹50",
+        "contact": "+919812345678",
+        "online_link": "https://wa.me/919812345678",
+        "languages": ["Hindi","English"]
+    },
+    {
+        "name": "Dr. Arjun Singh",
+        "specialization": "Dermatology",
+        "fee": "Free",
+        "contact": "+919876500123",
+        "online_link": "https://wa.me/919876500123",
+        "languages": ["Hindi","English"]
+    }
+]

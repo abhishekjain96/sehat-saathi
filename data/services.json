@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "name": "General Checkup",
+    "description": "Basic health examination",
+    "price": "Free",
+    "duration": "30 minutes",
+    "status": "active"
+  },
+  {
+    "id": 2,
+    "name": "Tele-Consultation",
+    "description": "Online doctor consultation",
+    "price": "\u20b950",
+    "duration": "20 minutes",
+    "status": "active"
+  }
+]

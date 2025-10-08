@@ -1,0 +1,18 @@
+[
+  {
+    "name": "PHC Kotri",
+    "type": "Government PHC",
+    "address": "Kotri, Bhilwara, Rajasthan",
+    "latitude": 25.35,
+    "longitude": 74.63,
+    "phone": "01482xxxxxx"
+  },
+  {
+    "name": "District Hospital Bhilwara",
+    "type": "District Hospital",
+    "address": "Main Rd, Bhilwara",
+    "latitude": 25.36,
+    "longitude": 74.64,
+    "phone": "01482yyyyyy"
+  }
+]
