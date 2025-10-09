@@ -1420,12 +1420,6 @@ if __name__ == '__main__':
     print("💡 Emergency Test Sequence:")
     print("1 -> nearby -> 302004 -> appoint -> 2 -> Raj Kumar -> ✅ CONFIRMED!")
     print("✅ All 5 features working with complete database backend!")
-    try:
-        from doctors_insert import insert_doctors
-        insert_doctors()
-    except Exception as e:
-        print(f"⚠️ Doctors insertion: {e}")
     
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
-    
